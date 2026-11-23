@@ -1,3 +1,4 @@
+import { Account } from './Account'
 import React, { useEffect, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import './solo.css'
@@ -128,6 +129,34 @@ function Table({ route }) {
         <h1>Asynchronous</h1>
         {view && <a href="#">Lobby</a>}
       </header>
+      {lobby && (
+        <Account
+          username={lobby.username}
+          busy={busy}
+          submit={async (action, body) => {
+            setBusy(true)
+            try {
+              if (action === 'logout' && 'serviceWorker' in navigator) {
+                const registration =
+                  await navigator.serviceWorker.getRegistration()
+                const subscription =
+                  await registration?.pushManager?.getSubscription()
+                if (subscription)
+                  await subscription.unsubscribe().catch(() => {})
+              }
+              await api(action, body)
+              if (
+                action === 'logout' ||
+                (action === 'login' && view === 'match')
+              )
+                location.hash = ''
+              location.reload()
+            } finally {
+              setBusy(false)
+            }
+          }}
+        />
+      )}
       {error && (
         <p role="alert">
           {error}{' '}
@@ -189,10 +218,7 @@ function Table({ route }) {
           </section>
           <h2>Your matches</h2>
           {lobby.matches.length === 0 ? (
-            <p>
-              Start a match above. Return in this browser to pick up where you
-              left off.
-            </p>
+            <p>Start a match above. Your saved matches will appear here.</p>
           ) : (
             <ul className="matches">
               {lobby.matches.map((m) => (

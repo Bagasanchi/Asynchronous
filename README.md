@@ -1,6 +1,6 @@
 # Asynchronous
 
-A browser card game for one or two people. In co-op, a friend claims the second seat through a private invitation. Players take turns controlling the same fighter through one encounter. The server saves every card and turn. A browser cookie identifies each seat, so players should return with the same browser profile. Clearing cookies loses access to that seat.
+A browser card game for one or two people. In co-op, a friend claims the second seat through a private invitation. Players take turns controlling the same fighter through one encounter. The server saves every card and turn. Play as a guest or sign up with a username and password. Signing up links the current browser’s guest seats to the new account. Log in on another device to resume. Guest seats remain browser-bound until signup. Keep your credentials in a password manager, as there is no password reset.
 
 ## Vercel and Supabase
 
@@ -74,4 +74,4 @@ Validate recent boards with their existing browser sessions before switching tra
 
 ## Release scope
 
-Solo and invitation-only co-op are playable for one encounter. The default reminder is the in-game turn indicator. Optional Web Push uses the browser's push service. Browser permission, HTTPS (or localhost), and a supported device are required. This release has browser-bound seats and no billing, cross-device account recovery or matchmaking service.
+Solo and invitation-only co-op are playable for one encounter. The default reminder is the in-game turn indicator. Optional Web Push uses the browser's push service. Browser permission, HTTPS (or localhost), and a supported device are required. Account sessions expire after 30 days. Billing and public matchmaking are outside this release.

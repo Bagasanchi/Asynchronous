@@ -69,3 +69,7 @@ footer {
     width: 100%;
   }
 }
+
+.account { margin: 1rem 0; }
+.account .actions { align-items: center; }
+.account form { max-width: 30rem; }

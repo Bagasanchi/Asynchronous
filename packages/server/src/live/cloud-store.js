@@ -16,7 +16,7 @@ pool.on('error', (err) =>
 )
 export const uuid =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
-async function transaction(fn) {
+export async function transaction(fn) {
   const c = await pool.connect()
   try {
     await c.query('begin')

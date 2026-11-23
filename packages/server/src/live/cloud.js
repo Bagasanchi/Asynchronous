@@ -1,10 +1,28 @@
+import { accountCookie, currentAccount, authenticate } from './accounts'
 import { createHash, randomBytes } from 'node:crypto'
 import { waitUntil } from '@vercel/functions'
 import { sendNotification } from 'web-push'
 import { validSubscription } from './notifications'
 import { detail, fail, summary } from './rules'
-import { pool, one, uuid, create, mutate } from './cloud-store'
+import { pool, one, uuid, create, mutate, transaction } from './cloud-store'
 
+function accountSql(sql) {
+  let index = 0
+  return sql
+    .replaceAll('@', 'asynchronous.')
+    .replace(/\?/g, () => '$' + ++index)
+}
+const authDb = {
+  one(sql, args) {
+    return one(pool, accountSql(sql), args)
+  },
+  batch(commands) {
+    return transaction(async (client) => {
+      for (const [sql, args] of commands)
+        await client.query(accountSql(sql), args)
+    })
+  },
+}
 async function deliver() {
   // Lease before delivery so a stopped function leaves a retryable job.
   const jobs = (
@@ -103,7 +121,10 @@ export default async function handler(req, res) {
           '; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=31536000',
       )
     }
-    const owner = createHash('sha256').update(token).digest('hex')
+    const guest = createHash('sha256').update(token).digest('hex')
+    const cookie = accountCookie(req, true)
+    const account = await currentAccount(authDb, cookie)
+    const owner = account?.id || guest
     if (req.method === 'GET' && path === 'session') {
       const rows = (
         await pool.query(
@@ -117,6 +138,7 @@ export default async function handler(req, res) {
         [owner],
       ))
       return res.json({
+        username: account?.username || null,
         matches: rows.map((r) => summary(r, owner)),
         pushKey: process.env.VAPID_PUBLIC_KEY || null,
         subscribed,
@@ -138,6 +160,20 @@ export default async function handler(req, res) {
     if (req.headers.origin !== 'https://' + req.headers.host)
       fail(403, 'Origin mismatch.')
     const body = bodyOf(req)
+    if (['signup', 'login', 'logout'].includes(path)) {
+      await authenticate({
+        db: authDb,
+        path: path,
+        body,
+        guest,
+        account,
+        cookie,
+        res,
+        address:
+          req.headers['x-vercel-forwarded-for'] || req.socket.remoteAddress,
+      })
+      return res.json({ ok: true })
+    }
     if (path === 'notifications') {
       if (!body.subscription)
         await pool.query('delete from asynchronous.devices where owner=$1', [

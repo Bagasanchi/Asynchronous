@@ -1,3 +1,4 @@
+import { accountCookie, currentAccount, authenticate } from './accounts'
 import { createServer } from 'node:http'
 import { createHash, randomBytes, randomUUID } from 'node:crypto'
 import { DatabaseSync } from 'node:sqlite'
@@ -18,6 +19,22 @@ db.exec(`PRAGMA journal_mode=WAL; PRAGMA busy_timeout=5000;
  CREATE INDEX IF NOT EXISTS matches_host ON matches(host,updated);
  CREATE INDEX IF NOT EXISTS matches_guest ON matches(guest,updated);
  CREATE INDEX IF NOT EXISTS matches_updated ON matches(updated);`)
+const authDb = {
+  one(sql, args) { return db.prepare(sql.replaceAll('@','')).get(...args) },
+  batch(commands) {
+    db.exec('begin immediate')
+    try {
+      for (const [sql, args] of commands) db.prepare(sql.replaceAll('@','')).run(...args)
+      db.exec('commit')
+    } catch (e) { db.exec('rollback'); throw e }
+  },
+}
+db.exec(`
+create table if not exists accounts (id text primary key, username text not null unique, salt text not null, verifier text not null);
+create table if not exists account_sessions (digest text primary key, account text not null references accounts(id), expires bigint not null);
+create index if not exists account_sessions_expiry on account_sessions(expires);
+create table if not exists login_limits (bucket text primary key, attempts integer not null, expires bigint not null);
+`)
 const push = notifications(db)
 const port = Number(process.env.PORT ?? 3000)
 const host = process.env.HOST || '127.0.0.1'
@@ -129,7 +146,10 @@ const server = createServer(async (req, res) => {
           (origin?.startsWith('https:') ? '; Secure' : ''),
       )
     }
-    const owner = createHash('sha256').update(token).digest('hex')
+    const guest = createHash('sha256').update(token).digest('hex')
+    const cookie = accountCookie(req, origin?.startsWith('https:'))
+    const account = await currentAccount(authDb, cookie)
+    const owner = account?.id || guest
     if (req.method === 'GET' && path === '/api/session') {
       const rows = db
         .prepare(
@@ -137,6 +157,7 @@ const server = createServer(async (req, res) => {
         )
         .all(owner, owner)
       return json({
+        username: account?.username || null,
         matches: rows.map((r) => summary(r, owner)),
         pushKey: push.publicKey,
         subscribed: !!db
@@ -151,6 +172,10 @@ const server = createServer(async (req, res) => {
     if (req.headers.origin !== (origin || 'http://' + req.headers.host))
       fail(403, 'Origin mismatch.')
     const body = await payload(req)
+    if (['signup','login','logout'].includes(path.slice(5))) {
+      await authenticate({db:authDb, path:path.slice(5), body, guest, account, cookie, res, address:req.socket.remoteAddress})
+      return json({ok:true})
+    }
     if (path === '/api/notifications') {
       if (!body.subscription) {
         db.prepare('DELETE FROM devices WHERE owner=?').run(owner)

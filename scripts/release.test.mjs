@@ -159,5 +159,27 @@ test(
     assert.deepEqual(await api(guest,path),{...m,seat:1})
     assert.deepEqual(await api(host,'matches/'+solo.id),solo)
     assert.equal((await api(guest,'session')).pushKey,key)
+    // Claim existing seats and resume from an independent browser.
+    const credentials = {username:'test_player', password:randomUUID()}
+    async function accountRequest(cookie, action) {
+      const response = await fetch(base + '/api/' + action, {
+        method: 'POST', headers: {cookie, origin:base, 'content-type':'application/json'},
+        body: JSON.stringify(credentials),
+      })
+      assert.equal(response.status, 200)
+      return response.headers.get('set-cookie').split(';')[0]
+    }
+    const firstSession = await accountRequest(host,'signup')
+    await api(host, path, undefined, 404)
+    const secondSession = await accountRequest(stranger,'login')
+    const signedIn = stranger + '; ' + secondSession
+    assert.equal((await api(signedIn,'session')).username, credentials.username)
+    assert.equal((await api(signedIn,path)).id,m.id)
+    await api(stranger,'login',{...credentials,password:randomUUID()},401)
+    await api(stranger,'signup',credentials,409)
+    await accountRequest(signedIn,'logout')
+    await api(signedIn,path,undefined,404)
+    assert.equal((await api(host + '; ' + firstSession,'matches/'+solo.id)).id,solo.id)
+
   },
 )
