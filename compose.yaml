@@ -1,0 +1,13 @@
+services:
+  game:
+    build: .
+    restart: unless-stopped
+    environment:
+      PUBLIC_ORIGIN: ${PUBLIC_ORIGIN:-http://localhost:3000}
+      VAPID_SUBJECT: ${VAPID_SUBJECT:-}
+    ports:
+      - "127.0.0.1:${GAME_PORT:-3000}:3000"
+    volumes:
+      - game-data:/data
+volumes:
+  game-data:

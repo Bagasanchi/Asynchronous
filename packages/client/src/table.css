@@ -1,0 +1,71 @@
+a {
+  color: #ecd099;
+  text-underline-offset: 0.22em;
+}
+.arena p {
+  max-width: 62ch;
+  line-height: 1.6;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+}
+.secondary {
+  background: transparent;
+  color: #ecd099;
+}
+.matches {
+  margin: 1rem 0;
+  padding: 0;
+  list-style: none;
+}
+.matches a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5em;
+  padding: 1em 0;
+  text-decoration: none;
+  border-bottom: 1px solid #534e49;
+}
+.matches a:hover b {
+  text-decoration: underline;
+}
+.matches span {
+  color: #cdc3b7;
+  font-size: 0.9em;
+}
+label {
+  display: block;
+  margin: 1.4em 0 0.7em;
+}
+input {
+  display: block;
+  width: min(100%, 40em);
+  margin-top: 0.4em;
+  padding: 0.7em;
+  color: inherit;
+  background: #222327;
+  border: 1px solid #8e816e;
+  border-radius: 0.4em;
+}
+footer {
+  margin-top: 2rem;
+}
+[role='alert'] {
+  color: #ffb6a5;
+}
+@media (max-width: 500px) {
+  .hand {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .card {
+    padding: 12px;
+  }
+  .matches span {
+    display: block;
+    width: 100%;
+  }
+}

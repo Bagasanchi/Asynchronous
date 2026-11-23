@@ -1,0 +1,288 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 222 47% 7%;
+    --foreground: 213 31% 91%;
+    --card: 222 47% 11%;
+    --card-foreground: 213 31% 91%;
+    --popover: 222 47% 11%;
+    --popover-foreground: 213 31% 91%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 222 47% 7%;
+    --secondary: 222 47% 15%;
+    --secondary-foreground: 213 31% 91%;
+    --muted: 222 47% 15%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 262 83% 58%;
+    --accent-foreground: 222 47% 7%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 213 31% 91%;
+    --border: 222 47% 20%;
+    --input: 222 47% 20%;
+    --ring: 217 91% 60%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 222 47% 7%;
+    --foreground: 213 31% 91%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .animate-in {
+    animation: animate-in 0.3s ease-out;
+  }
+
+  @keyframes animate-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .card-hover {
+    @apply transition-all duration-200 hover:shadow-lg hover:-translate-y-1;
+  }
+
+  .btn-primary {
+    @apply px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium
+           hover:bg-primary/90 active:bg-primary
+           focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background
+           disabled:opacity-50 disabled:cursor-not-allowed
+           transition-colors duration-200;
+  }
+
+  .btn-secondary {
+    @apply px-4 py-2 bg-secondary text-secondary-foreground rounded-lg font-medium
+           hover:bg-secondary/80 active:bg-secondary
+           focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background
+           disabled:opacity-50 disabled:cursor-not-allowed
+           transition-colors duration-200;
+  }
+
+  .btn-ghost {
+    @apply px-4 py-2 text-foreground rounded-lg font-medium
+           hover:bg-accent/10 active:bg-accent/20
+           focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background
+           disabled:opacity-50 disabled:cursor-not-allowed
+           transition-colors duration-200;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-2 bg-background border border-input rounded-lg
+           text-foreground placeholder:text-muted-foreground
+           focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent
+           disabled:opacity-50 disabled:cursor-not-allowed
+           transition-colors duration-200;
+  }
+
+  .card-game {
+    @apply bg-card border border-border rounded-xl p-6 shadow-lg;
+  }
+}
+
+@layer components {
+  .game-card {
+    @apply relative bg-card border border-border rounded-lg overflow-hidden
+           transition-all duration-300 hover:shadow-xl hover:border-primary/50;
+  }
+
+  .card-frame {
+    @apply relative aspect-[2/3] rounded-lg overflow-hidden
+           bg-gradient-to-br from-gray-800 to-gray-900
+           border-2 border-gray-600 shadow-lg;
+  }
+
+  .card-frame.common { @apply border-gray-500; }
+  .card-frame.uncommon { @apply border-green-500; }
+  .card-frame.rare { @apply border-blue-500; }
+  .card-frame.legendary { @apply border-yellow-400; }
+  .card-frame.mythic { @apply border-purple-500; }
+
+  .energy-orb {
+    @apply w-8 h-8 rounded-full bg-yellow-400 flex items-center justify-center
+           font-bold text-gray-900 shadow-lg shadow-yellow-400/50;
+  }
+
+  .hp-bar {
+    @apply h-3 bg-gray-700 rounded-full overflow-hidden;
+  }
+
+  .hp-fill {
+    @apply h-full bg-red-500 transition-all duration-300 ease-out;
+  }
+
+  .block-bar {
+    @apply h-3 bg-gray-700 rounded-full overflow-hidden;
+  }
+
+  .block-fill {
+    @apply h-full bg-blue-500 transition-all duration-300 ease-out;
+  }
+
+  .mana-cost {
+    @apply absolute -top-2 -right-2 w-7 h-7 rounded-full bg-gray-800 border-2 border-gray-500
+           flex items-center justify-center text-sm font-bold text-white shadow-lg;
+  }
+}
+
+/* Game board specific styles */
+.game-board {
+  @apply relative min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950;
+}
+
+.player-area {
+  @apply relative p-4;
+}
+
+.enemy-area {
+  @apply relative p-4;
+}
+
+.hand-area {
+  @apply fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-gray-950 to-transparent z-20;
+}
+
+.card-in-hand {
+  @apply cursor-pointer transition-all duration-200
+         hover:scale-105 hover:-translate-y-4 hover:shadow-2xl hover:z-30
+         active:scale-100 active:translate-y-0;
+}
+
+.card-in-hand.playable {
+  @apply ring-2 ring-green-400 ring-offset-2 ring-offset-gray-900;
+}
+
+.card-in-hand.selected {
+  @apply -translate-y-8 scale-110 ring-2 ring-primary ring-offset-2 ring-offset-gray-900 z-40;
+}
+
+.card-in-hand.exhausted {
+  @apply opacity-50 grayscale;
+}
+
+.turn-indicator {
+  @apply absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-primary text-primary-foreground
+         rounded-full text-sm font-medium shadow-lg animate-pulse;
+}
+
+.action-log {
+  @apply max-h-64 overflow-y-auto space-y-1 p-2 bg-gray-900/50 rounded-lg;
+}
+
+.log-entry {
+  @apply text-sm text-gray-300 hover:text-gray-100 transition-colors;
+}
+
+.log-entry.important {
+  @apply text-yellow-300 font-medium;
+}
+
+.log-entry.damage {
+  @apply text-red-400;
+}
+
+.log-entry.heal {
+  @apply text-green-400;
+}
+
+.log-entry.block {
+  @apply text-blue-400;
+}
+
+/* Modal styles */
+.modal-overlay {
+  @apply fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4;
+}
+
+.modal-content {
+  @apply bg-card border border-border rounded-xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-hidden;
+}
+
+.modal-header {
+  @apply px-6 py-4 border-b border-border flex items-center justify-between;
+}
+
+.modal-body {
+  @apply px-6 py-4 overflow-y-auto;
+}
+
+.modal-footer {
+  @apply px-6 py-4 border-t border-border flex justify-end gap-3;
+}
+
+/* Toast notifications */
+.toast-container {
+  @apply fixed top-4 right-4 z-50 flex flex-col gap-2;
+}
+
+.toast {
+  @apply bg-card border border-border rounded-lg p-4 shadow-lg min-w-[300px] max-w-md
+         animate-slide-in-right;
+}
+
+.toast.success { @apply border-green-500/50; }
+.toast.error { @apply border-red-500/50; }
+.toast.warning { @apply border-yellow-500/50; }
+.toast.info { @apply border-blue-500/50; }
+
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Loading spinner */
+.spinner {
+  @apply animate-spin rounded-full border-2 border-primary border-t-transparent;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .hand-area {
+    @apply p-2;
+  }
+
+  .card-in-hand {
+    @apply transform-none hover:scale-100 hover:translate-y-0;
+  }
+
+  .card-in-hand.selected {
+    @apply scale-100 translate-y-0 ring-2 ring-primary ring-offset-2 ring-offset-gray-900;
+  }
+}

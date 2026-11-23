@@ -1,0 +1,22 @@
+services:
+  game:
+    environment:
+      PUBLIC_ORIGIN: https://${GAME_DOMAIN:?Set GAME_DOMAIN to your public hostname}
+  proxy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      game:
+        condition: service_healthy
+    environment:
+      GAME_DOMAIN: ${GAME_DOMAIN:?Set GAME_DOMAIN to your public hostname}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - certificates:/data
+      - caddy-config:/config
+volumes:
+  certificates:
+  caddy-config:

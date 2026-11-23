@@ -1,0 +1,19 @@
+:root {color-scheme: dark; font-family: "Segoe UI", sans-serif; color: #efe9dd; background: #17191d}
+* {box-sizing: border-box}
+body {margin: 0; min-height: 100vh; background: radial-gradient(ellipse at top right,#342c2a,transparent 65%)}
+main {max-width: 1050px; margin: auto; padding: clamp(18px,4vw,48px)}
+header,.row {display:flex; align-items:center; justify-content:space-between; gap:12px}
+header {border-bottom:1px solid #5c5550; padding-bottom:18px}
+h1,h2,strong {font-family: Georgia,serif; font-weight:normal; margin:0}
+h1 {font-size:clamp(32px,5vw,56px)} h2 {font-size:32px}
+header span,small,h3 {text-transform:uppercase; letter-spacing:.12em; font-size:12px; color:#d5b883}
+.arena {padding:28px 0; border-bottom:1px solid #5c5550; margin-bottom:24px}
+.arena h2 {margin-top:8px; font-size:46px}
+progress {width:min(380px,90%); accent-color:#c87059}
+button {font:inherit; cursor:pointer; border:1px solid #ab8e59; border-radius:7px; background:#e0c58b; color:#231f18; padding:10px 18px}
+button:focus-visible {outline:3px solid white; outline-offset:3px} button:disabled {opacity:.49; cursor:default}
+.hand {display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px}
+.card {display:flex; flex-direction:column; gap:12px; align-items:flex-start; text-align:left; color:#f4eee2; min-height:155px; padding:18px; background:linear-gradient(155deg,#563632,#292323)}
+.card.skill {background:linear-gradient(155deg,#31464b,#22282c)}
+.card strong {font-size:26px}.card span {font-size:14px}.card:enabled:hover {border-color:#ffdea2; transform:translateY(-2px)}
+.stats {color:#e5cb94}.buff {margin-right:12px} details {margin-top:25px; border-top:1px solid #555052; padding-top:18px}summary {cursor:pointer} li {margin:.4em 0}
